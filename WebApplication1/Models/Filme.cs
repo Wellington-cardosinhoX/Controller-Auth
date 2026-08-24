@@ -4,6 +4,8 @@ namespace WebApplication1.Models;
 
 public class Filme
 {
+    [Key]
+    [Required]
     public int Id { get; set; }
 
     [Required(ErrorMessage = "O título não pode ser vazio")]
