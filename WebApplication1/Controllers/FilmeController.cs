@@ -63,6 +63,6 @@ public class FilmeController : ControllerBase
         _filmeContext.Filmes.Remove(pegarFilme);
         _filmeContext?.SaveChangesAsync();
 
-        return Ok(pegarFilme);
+        return NoContent();
     }
 }
