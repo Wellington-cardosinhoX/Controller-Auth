@@ -1,7 +1,9 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WebApplication1.Data;
 using WebApplication1.Extensions;
 
 namespace WebApplication1;
@@ -12,13 +14,13 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllers();
-        builder.Services.AddOpenApi();
+        builder.Services.AddOpenApi();    
         builder.Services.AddJwtAuthentication(builder.Configuration);
         builder.Services.AddAuthorization();
+        builder.Services.AddConnectionString(builder.Configuration);
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
@@ -27,7 +29,6 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
-
 
         app.MapControllers();
 
