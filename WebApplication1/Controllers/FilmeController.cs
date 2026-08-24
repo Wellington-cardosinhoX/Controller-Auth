@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApplication1.Data;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers;
@@ -8,14 +9,18 @@ namespace WebApplication1.Controllers;
 [Route("[controller]")]
 public class FilmeController : ControllerBase
 {
-    private static List<Filme> filmes = [];
-    private static int id = 0;
+    private FilmeContext _filmeContext;
+
+    public FilmeController(FilmeContext filmeContext)
+    {
+        _filmeContext = filmeContext;
+    }
 
     [Authorize]
     [HttpGet]
-    public IActionResult PegarFilmes([FromQuery] int skip = 0, [FromQuery] int take = 20)
+    public async Task<IActionResult> PegarFilmes([FromQuery] int skip = 0, [FromQuery] int take = 20)
     {
-        var SkipTake = filmes.Skip(skip).Take(take);
+        var SkipTake =  _filmeContext.Filmes.Skip(skip).Take(take);
 
         if (SkipTake is not null) 
         {
@@ -27,9 +32,9 @@ public class FilmeController : ControllerBase
 
     [Authorize]
     [HttpGet("{id}")]
-    public IActionResult PegarFilmePorId(int id)
+    public async Task<IActionResult> PegarFilmePorId(int id)
     {
-        var primeiroFilme = filmes.FirstOrDefault(t => t.Id == id);
+        var primeiroFilme = await _filmeContext.Filmes.FindAsync(id);
         if (primeiroFilme is null) return NotFound($"Id {id} não encontrado!");
 
         return Ok(primeiroFilme);
@@ -37,21 +42,26 @@ public class FilmeController : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public IActionResult AdicionaFilme([FromBody] Filme filme)
+    public async Task<IActionResult> AdicionaFilme([FromBody] Filme filme)
     {
-        filme.Id = id++;
-        filmes.Add(filme);
+        var adicionaFilme = _filmeContext.Filmes.Add(filme);
+
+        if (adicionaFilme is null) return NotFound();
+
+        await _filmeContext.SaveChangesAsync();
+
         return CreatedAtAction(nameof(PegarFilmePorId), new { id = filme.Id}, filme);
     }
 
     [Authorize]
     [HttpDelete("{id}")]
-    public IActionResult DeletarFilme(int id)
+    public async Task<IActionResult> DeletarFilme(int id)
     {
-        var pegarFilme = filmes.FirstOrDefault(t => t.Id == id);
+        var pegarFilme = await _filmeContext.Filmes.FindAsync(id);
         if (pegarFilme is null) return NotFound("Esse Id não existe");
 
-        filmes.Remove(pegarFilme);
+        _filmeContext.Filmes.Remove(pegarFilme);
+        _filmeContext?.SaveChangesAsync();
 
         return Ok(pegarFilme);
     }
