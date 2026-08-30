@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WebApplication1.Controllers;
 using WebApplication1.Data;
 using WebApplication1.Extensions;
 using WebApplication1.Profiles;

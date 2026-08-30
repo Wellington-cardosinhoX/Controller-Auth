@@ -26,11 +26,13 @@ public class FilmeController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> PegarFilmes([FromQuery] int skip = 0, [FromQuery] int take = 20)
     {
-        var SkipTake =  _filmeContext.Filmes.Skip(skip).Take(take);
+        var SkipTake = _filmeContext.Filmes.Skip(skip).Take(take);
 
-        if (SkipTake is not null) 
+        var filmesDto = _mapper.Map<List<ReadFilmeDto>>(SkipTake);
+
+        if (filmesDto is not null) 
         {
-            return Ok(SkipTake);
+            return Ok(filmesDto);
         }
 
         return NotFound();
@@ -43,7 +45,9 @@ public class FilmeController : ControllerBase
         var primeiroFilme = await _filmeContext.Filmes.FindAsync(id);
         if (primeiroFilme is null) return NotFound($"Id {id} não encontrado!");
 
-        return Ok(primeiroFilme);
+        var filmeDto = _mapper.Map<ReadFilmeDto>(primeiroFilme);
+
+        return Ok(filmeDto);
     }
 
     [Authorize(Roles = "Admin")]
@@ -102,7 +106,7 @@ public class FilmeController : ControllerBase
     [HttpPatch("{id}")]
     public async Task<IActionResult> AtualizarFilmeParcial(int id, JsonPatchDocument<UpdateFilmeDto> jsonPatchDocument)
     {
-        var filme = _filmeContext.Filmes.FirstOrDefault(filme => filme.Id == id);
+        var filme = await _filmeContext.Filmes.FirstOrDefaultAsync(filme => filme.Id == id);
 
         if (filme is null) return NotFound();
             
