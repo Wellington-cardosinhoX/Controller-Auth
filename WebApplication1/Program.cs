@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebApplication1.Data;
 using WebApplication1.Extensions;
+using WebApplication1.Profiles;
 
 namespace WebApplication1;
 public class Program
@@ -13,11 +14,12 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers().AddNewtonsoftJson();
         builder.Services.AddOpenApi();    
         builder.Services.AddJwtAuthentication(builder.Configuration);
         builder.Services.AddAuthorization();
         builder.Services.AddConnectionString(builder.Configuration);
+        builder.Services.AddAutoMapper(cfg => { }, typeof(FilmeProfile));
 
         var app = builder.Build();
 
