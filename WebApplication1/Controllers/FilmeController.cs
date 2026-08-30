@@ -1,5 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebApplication1.Data;
+using WebApplication1.Data.DTOs;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers;
@@ -8,18 +13,26 @@ namespace WebApplication1.Controllers;
 [Route("[controller]")]
 public class FilmeController : ControllerBase
 {
-    private static List<Filme> filmes = [];
-    private static int id = 0;
+    private FilmeContext _filmeContext;
+    private readonly IMapper _mapper;
+
+    public FilmeController(FilmeContext filmeContext, IMapper mapper)
+    {
+        _filmeContext = filmeContext;
+        _mapper = mapper;
+    }
 
     [Authorize]
     [HttpGet]
-    public IActionResult PegarFilmes([FromQuery] int skip = 0, [FromQuery] int take = 20)
+    public async Task<IActionResult> PegarFilmes([FromQuery] int skip = 0, [FromQuery] int take = 20)
     {
-        var SkipTake = filmes.Skip(skip).Take(take);
+        var SkipTake = _filmeContext.Filmes.Skip(skip).Take(take);
 
-        if (SkipTake is not null) 
+        var filmesDto = _mapper.Map<List<ReadFilmeDto>>(SkipTake);
+
+        if (filmesDto is not null) 
         {
-            return Ok(SkipTake);
+            return Ok(filmesDto);
         }
 
         return NotFound();
@@ -27,32 +40,89 @@ public class FilmeController : ControllerBase
 
     [Authorize]
     [HttpGet("{id}")]
-    public IActionResult PegarFilmePorId(int id)
+    public async Task<IActionResult> PegarFilmePorId(int id)
     {
-        var primeiroFilme = filmes.FirstOrDefault(t => t.Id == id);
+        var primeiroFilme = await _filmeContext.Filmes.FindAsync(id);
         if (primeiroFilme is null) return NotFound($"Id {id} não encontrado!");
 
-        return Ok(primeiroFilme);
+        var filmeDto = _mapper.Map<ReadFilmeDto>(primeiroFilme);
+
+        return Ok(filmeDto);
     }
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public IActionResult AdicionaFilme([FromBody] Filme filme)
+    public async Task<IActionResult> AdicionaFilme([FromBody] CreateFilmeDto filmeDto)
     {
-        filme.Id = id++;
-        filmes.Add(filme);
+        Filme filme = _mapper.Map<Filme>(filmeDto);
+
+        var adicionaFilme = _filmeContext.Filmes.Add(filme);
+
+        if (adicionaFilme is null) return NotFound();
+
+        await _filmeContext.SaveChangesAsync();
+
         return CreatedAtAction(nameof(PegarFilmePorId), new { id = filme.Id}, filme);
     }
 
     [Authorize]
     [HttpDelete("{id}")]
-    public IActionResult DeletarFilme(int id)
+    public async Task<IActionResult> DeletarFilme(int id)
     {
-        var pegarFilme = filmes.FirstOrDefault(t => t.Id == id);
+        var pegarFilme = await _filmeContext.Filmes.FindAsync(id);
         if (pegarFilme is null) return NotFound("Esse Id não existe");
 
-        filmes.Remove(pegarFilme);
+        _filmeContext.Filmes.Remove(pegarFilme);
+        await _filmeContext.SaveChangesAsync();
 
-        return Ok(pegarFilme);
+        return NoContent();
+    }
+
+
+    [Authorize]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> AtualizarFilme(int id, [FromBody] UpdateFilmeDto updateFilmeDto)
+    {
+        try
+        {
+            var filme = _filmeContext.Filmes.FirstOrDefault(filme => filme.Id == id);
+
+            if (filme is null) return NotFound();
+
+            _mapper.Map(updateFilmeDto, filme);
+
+            await _filmeContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+        catch (Exception ex) when (ex.Message.Contains("Missing"))
+        {
+            throw new Exception("Você não configurou um CreateMap<>() para o profile atual");
+        }
+    }
+
+
+    [Authorize]
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> AtualizarFilmeParcial(int id, JsonPatchDocument<UpdateFilmeDto> jsonPatchDocument)
+    {
+        var filme = await _filmeContext.Filmes.FirstOrDefaultAsync(filme => filme.Id == id);
+
+        if (filme is null) return NotFound();
+            
+        var filmeParaAtualizar = _mapper.Map<UpdateFilmeDto>(filme);
+
+        jsonPatchDocument.ApplyTo(filmeParaAtualizar, ModelState);
+
+        if (!TryValidateModel(filmeParaAtualizar))
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        _mapper.Map(filmeParaAtualizar, filme);
+
+        await _filmeContext.SaveChangesAsync();
+
+        return NoContent();   
     }
 }
