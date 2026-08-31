@@ -1,10 +1,10 @@
-﻿using AutoMapper;
+﻿using ApiAutoMapper.Data.DTOs.Filme;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
-using WebApplication1.Data.DTOs;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers;

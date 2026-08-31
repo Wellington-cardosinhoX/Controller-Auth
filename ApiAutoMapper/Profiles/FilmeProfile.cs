@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using WebApplication1.Data.DTOs;
+﻿using ApiAutoMapper.Data.DTOs.Filme;
+using AutoMapper;
 using WebApplication1.Models;
 
 namespace WebApplication1.Profiles
