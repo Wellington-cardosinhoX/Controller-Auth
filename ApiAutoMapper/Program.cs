@@ -1,4 +1,5 @@
 
+using ApiAutoMapper.Profiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -20,7 +21,7 @@ public class Program
         builder.Services.AddJwtAuthentication(builder.Configuration);
         builder.Services.AddAuthorization();
         builder.Services.AddConnectionString(builder.Configuration);
-        builder.Services.AddAutoMapper(cfg => { }, typeof(FilmeProfile));
+        builder.Services.AddAutoMapper(cfg => { }, typeof(FilmeProfile), typeof(CinemaProfile), typeof(EnderecoProfile));
 
         var app = builder.Build();
 
