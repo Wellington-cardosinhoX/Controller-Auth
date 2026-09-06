@@ -1,5 +1,6 @@
 ﻿using ApiAutoMapper.Data.DTOs.Cinema;
 using ApiAutoMapper.Data.DTOs.Filme;
+using ApiAutoMapper.Exceptions;
 using ApiAutoMapper.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +12,8 @@ using WebApplication1.Models;
 
 namespace ApiAutoMapper.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class CinemaController : ControllerBase
 {
     private FilmeContext _context;
@@ -22,11 +25,10 @@ public class CinemaController : ControllerBase
         _mapper = mapper;
     }
 
-    [Authorize]
     [HttpGet]
     public async Task<IActionResult> PegarCinemas([FromQuery] int skip = 0, [FromQuery] int take = 20)
     {
-        var SkipTake = _context.Cinemas.Skip(skip).Take(take);
+        var SkipTake = _context.Cinemas.Include(c => c.Endereco).Skip(skip).Take(take);
 
         var cinemasDto = _mapper.Map<List<ReadCinemaDto>>(SkipTake);
 
@@ -38,7 +40,6 @@ public class CinemaController : ControllerBase
         return NotFound();
     }
 
-    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> PegarCinemaPorId(int id)
     {
@@ -50,7 +51,6 @@ public class CinemaController : ControllerBase
         return Ok(filmeDto);
     }
 
-    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> AdicionaCinema([FromBody] CreateCinemaDto cinemaDto)
     {
@@ -60,12 +60,18 @@ public class CinemaController : ControllerBase
 
         if (adicionaCinema is null) return NotFound();
 
+        var cinemaComEndereco = await _context.Cinemas.AnyAsync(c => c.EnderecoId == cinemaDto.EnderecoId);
+
+        if (cinemaComEndereco)
+        {
+            throw new EnderecoJaAssociadoException();
+        }
+
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(PegarCinemaPorId), new { id = cinema.Id }, cinema);
     }
 
-    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletarCinema(int id)
     {
@@ -79,7 +85,6 @@ public class CinemaController : ControllerBase
     }
 
 
-    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> AtualizarCinema(int id, [FromBody] UpdateCinemaDto updateFilmeDto)
     {

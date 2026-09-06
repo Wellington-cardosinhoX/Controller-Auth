@@ -9,7 +9,7 @@ namespace WebApplication1.Extensions
         {
             services.AddDbContext<FilmeContext>(opts =>
             {
-                opts.UseMySQL(configuration.GetConnectionString("FilmeConnection")
+                opts.UseLazyLoadingProxies().UseMySQL(configuration.GetConnectionString("FilmeConnection")
                     ?? throw new InvalidOperationException("A connection string não foi encontrada na configuração"));
             });
 
