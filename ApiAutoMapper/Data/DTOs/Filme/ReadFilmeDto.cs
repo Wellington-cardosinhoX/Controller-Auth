@@ -11,5 +11,7 @@ namespace ApiAutoMapper.Data.DTOs.Filme
         public int Duracao { get; set; }
 
         public DateTime HoraDaConsulta { get; set; } = DateTime.Now;
+
+        public ICollection<ApiAutoMapper.Models.Sessao> Sessoes { get; set; } = null!;
     }
 }
