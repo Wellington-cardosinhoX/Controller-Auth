@@ -1,4 +1,4 @@
-Ôªøusing Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 
 namespace WebApplication1.Extensions
@@ -9,8 +9,8 @@ namespace WebApplication1.Extensions
         {
             services.AddDbContext<FilmeContext>(opts =>
             {
-                opts.UseLazyLoadingProxies().UseMySQL(configuration.GetConnectionString("FilmeConnection")
-                    ?? throw new InvalidOperationException("A connection string n√£o foi encontrada na configura√ß√£o"));
+                opts.UseNpgsql(configuration.GetConnectionString("FilmeConnection")
+                    ?? throw new InvalidOperationException("A connection string n„o foi encontrada na configuraÁ„o"));
             });
 
             return services;
