@@ -10,7 +10,7 @@ namespace ApiAutoMapper.Profiles
         public SessaoProfile()
         {
             CreateMap<CreateSessaoDto, Sessao>();
-            CreateMap<Sessao, ReadCinemaDto>();
+            CreateMap<Sessao, ReadSessaoDto>();
         }
     }
 }

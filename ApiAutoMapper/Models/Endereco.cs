@@ -5,7 +5,7 @@ namespace ApiAutoMapper.Models
     public class Endereco
     {
         [Key]
-        [Required]  
+        [Required] 
         public int Id { get; set; }
         [Required(ErrorMessage = "O campo Logradouro é obrigatório.")]
         public string Logradouro { get; set; } = string.Empty;

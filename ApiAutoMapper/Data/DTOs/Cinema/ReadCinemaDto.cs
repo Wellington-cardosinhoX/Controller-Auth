@@ -1,4 +1,5 @@
 ﻿using ApiAutoMapper.Data.DTOs.Endereco;
+using ApiAutoMapper.Data.DTOs.Sessao;
 
 namespace ApiAutoMapper.Data.DTOs.Cinema
 {
@@ -10,6 +11,6 @@ namespace ApiAutoMapper.Data.DTOs.Cinema
 
         public ReadEnderecoDto ReadEnderecoDto { get; set; } = null!;
 
-        public ICollection<ApiAutoMapper.Models.Sessao> Sessoes { get; set; } = null!;
+        public ICollection<ReadSessaoDto> Sessoes { get; set; } = null!;
     }
 }

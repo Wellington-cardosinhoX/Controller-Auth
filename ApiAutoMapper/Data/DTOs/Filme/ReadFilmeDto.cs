@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ApiAutoMapper.Data.DTOs.Sessao;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiAutoMapper.Data.DTOs.Filme
 {
@@ -12,6 +13,6 @@ namespace ApiAutoMapper.Data.DTOs.Filme
 
         public DateTime HoraDaConsulta { get; set; } = DateTime.Now;
 
-        public ICollection<ApiAutoMapper.Models.Sessao> Sessoes { get; set; } = null!;
+        public ICollection<ReadSessaoDto> Sessoes { get; set; } = null!;
     }
 }

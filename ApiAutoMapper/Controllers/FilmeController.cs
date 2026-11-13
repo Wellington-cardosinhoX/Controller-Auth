@@ -13,29 +13,35 @@ namespace WebApplication1.Controllers;
 [Route("[controller]")]
 public class FilmeController : ControllerBase
 {
+    private readonly ILogger<FilmeController> _logger;
     private FilmeContext _filmeContext;
     private readonly IMapper _mapper;
 
-    public FilmeController(FilmeContext filmeContext, IMapper mapper)
+    public FilmeController(FilmeContext filmeContext, IMapper mapper, ILogger<FilmeController> logger)
     {
         _filmeContext = filmeContext;
         _mapper = mapper;
+        _logger = logger;
     }
 
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> PegarFilmes([FromQuery] int skip = 0, [FromQuery] int take = 20)
     {
-        var SkipTake = _filmeContext.Filmes.Skip(skip).Take(take);
+        var SkipTake = await _filmeContext.Filmes.Include(c => c.Sessoes).OrderBy(f => f.Id).Skip(skip).Take(take).ToListAsync();
+
+        foreach (var i in SkipTake)
+        {
+            _logger.LogWarning("Nome do filme: {NomeUsuario}", i.Titulo);
+            foreach (var item in i.Sessoes)
+            {
+                _logger.LogWarning($"FilmeId: {item.FilmeId} -- CinemaId: {item.CinemaId}");
+            }
+        }
 
         var filmesDto = _mapper.Map<List<ReadFilmeDto>>(SkipTake);
 
-        if (filmesDto is not null) 
-        {
-            return Ok(filmesDto);
-        }
-
-        return NotFound();
+        return Ok(filmesDto);
     }
 
     [Authorize]
@@ -109,7 +115,7 @@ public class FilmeController : ControllerBase
         var filme = await _filmeContext.Filmes.FirstOrDefaultAsync(filme => filme.Id == id);
 
         if (filme is null) return NotFound();
-            
+
         var filmeParaAtualizar = _mapper.Map<UpdateFilmeDto>(filme);
 
         jsonPatchDocument.ApplyTo(filmeParaAtualizar, ModelState);
@@ -123,6 +129,6 @@ public class FilmeController : ControllerBase
 
         await _filmeContext.SaveChangesAsync();
 
-        return NoContent();   
+        return NoContent();
     }
 }

@@ -28,16 +28,12 @@ public class CinemaController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> PegarCinemas([FromQuery] int skip = 0, [FromQuery] int take = 20)
     {
-        var SkipTake = _context.Cinemas.Include(c => c.Endereco).Skip(skip).Take(take);
+        var SkipTake = await _context.Cinemas.Include(c => c.Endereco)
+            .Include(f => f.Sessoes).OrderBy(c => c.Id).Skip(skip).Take(count: take).ToListAsync();
 
         var cinemasDto = _mapper.Map<List<ReadCinemaDto>>(SkipTake);
 
-        if (cinemasDto is not null)
-        {
-            return Ok(cinemasDto);
-        }
-
-        return NotFound();
+        return Ok(cinemasDto);
     }
 
     [HttpGet("{id}")]
