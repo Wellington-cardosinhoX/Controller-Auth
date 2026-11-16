@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using WebApplication1.Data.DTOs;
+﻿using ApiAutoMapper.Data.DTOs.Filme;
+using AutoMapper;
 using WebApplication1.Models;
 
 namespace WebApplication1.Profiles
@@ -11,7 +11,7 @@ namespace WebApplication1.Profiles
             CreateMap<CreateFilmeDto, Filme>();
             CreateMap<UpdateFilmeDto, Filme>();
             CreateMap<Filme, UpdateFilmeDto>();
-            CreateMap<Filme, ReadFilmeDto>();
+            CreateMap<Filme, ReadFilmeDto>().ForMember(destinationMember: filmeDto => filmeDto.Sessoes, opt => opt.MapFrom(filme => filme.Sessoes));
         }
     }
 }

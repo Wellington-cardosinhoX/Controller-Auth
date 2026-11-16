@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebApplication1.Data.DTOs
+namespace ApiAutoMapper.Data.DTOs.Filme
 {
     public class UpdateFilmeDto : CreateFilmeDto { }
 }
