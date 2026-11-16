@@ -41,7 +41,7 @@ namespace ApiAutoMapper.Migrations
                     b.HasIndex("EnderecoId")
                         .IsUnique();
 
-                    b.ToTable("Cinemas");
+                    b.ToTable("Cinemas", (string)null);
                 });
 
             modelBuilder.Entity("ApiAutoMapper.Models.Endereco", b =>
@@ -61,7 +61,7 @@ namespace ApiAutoMapper.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Enderecos");
+                    b.ToTable("Enderecos", (string)null);
                 });
 
             modelBuilder.Entity("ApiAutoMapper.Models.Sessao", b =>
@@ -75,7 +75,7 @@ namespace ApiAutoMapper.Migrations
                     b.Property<int?>("CinemaId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FilmeId")
+                    b.Property<int?>("FilmeId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -84,7 +84,7 @@ namespace ApiAutoMapper.Migrations
 
                     b.HasIndex("FilmeId");
 
-                    b.ToTable("Sessoes");
+                    b.ToTable("Sessoes", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Filme", b =>
@@ -108,7 +108,7 @@ namespace ApiAutoMapper.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Filmes");
+                    b.ToTable("Filmes", (string)null);
                 });
 
             modelBuilder.Entity("ApiAutoMapper.Models.Cinema", b =>
@@ -130,9 +130,7 @@ namespace ApiAutoMapper.Migrations
 
                     b.HasOne("WebApplication1.Models.Filme", "Filme")
                         .WithMany("Sessoes")
-                        .HasForeignKey("FilmeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("FilmeId");
 
                     b.Navigation("Cinema");
 

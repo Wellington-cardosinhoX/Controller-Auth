@@ -1,11 +1,4 @@
-
 using ApiAutoMapper.Profiles;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using WebApplication1.Controllers;
-using WebApplication1.Data;
 using WebApplication1.Extensions;
 using WebApplication1.Profiles;
 
@@ -17,7 +10,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllers().AddNewtonsoftJson();
-        builder.Services.AddOpenApi();    
+        builder.Services.AddOpenApi();
         builder.Services.AddJwtAuthentication(builder.Configuration);
         builder.Services.AddAuthorization();
         builder.Services.AddConnectionString(builder.Configuration);
